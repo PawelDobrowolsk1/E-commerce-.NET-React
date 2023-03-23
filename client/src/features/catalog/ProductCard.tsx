@@ -1,8 +1,5 @@
 import {
-  ListItem,
-  ListItemAvatar,
   Avatar,
-  ListItemText,
   Button,
   Card,
   CardActions,
