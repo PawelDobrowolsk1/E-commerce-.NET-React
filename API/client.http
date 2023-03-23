@@ -1,0 +1,7 @@
+﻿@baseUrl = http://localhost:5000
+
+GET {{baseUrl}}/api/Products
+
+###
+
+GET {{baseUrl}}/api/Products/4
