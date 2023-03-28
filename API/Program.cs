@@ -1,6 +1,8 @@
 using API.Data;
 using API.Middleware;
+using Microsoft.AspNetCore.Http.Json;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,10 +14,16 @@ builder.Services.AddMvc()
     .AddJsonOptions(opt =>
     {
         opt.JsonSerializerOptions.WriteIndented = true;
+        //opt.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
     });
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+//builder.Services.Configure<JsonOptions>(options =>
+//{
+//    options.SerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+//});
 
 builder.Services.AddDbContext<StoreContext>(options =>
 {
@@ -38,6 +46,7 @@ app.UseCors(opt =>
 {
     opt.AllowAnyHeader()
     .AllowAnyMethod()
+    .AllowCredentials()
     .WithOrigins("http://localhost:3000");
 });
 
