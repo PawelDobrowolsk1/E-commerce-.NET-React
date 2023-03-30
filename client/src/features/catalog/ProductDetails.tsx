@@ -12,10 +12,8 @@ import {
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import agent from "../../app/api/agent";
 import NotFound from "../../app/errors/NotFound";
 import LoadingComponent from "../../app/layout/LoadingComponent";
-import { Product } from "../../app/models/product";
 import { useAppSelector, useAppDispatch } from "../../app/store/configureStore";
 import {
   addBasketItemAsync,
@@ -27,14 +25,16 @@ export default function ProductDetails() {
   const { basket, status } = useAppSelector((state) => state.basket);
   const dispatch = useAppDispatch();
   const { id } = useParams<{ id: string }>();
-  const product = useAppSelector(state => productSelectors.selectById(state, id!));
-  const {status: productStatus} = useAppSelector(state => state.catalog)
+  const product = useAppSelector((state) =>
+    productSelectors.selectById(state, id!)
+  );
+  const { status: productStatus } = useAppSelector((state) => state.catalog);
   const [quantity, setQuantity] = useState(0);
   const item = basket?.items.find((i) => i.productId === product?.id);
 
   useEffect(() => {
     if (item) setQuantity(item.quantity);
-    if(!product && id) dispatch(fetchProductAsync(parseInt(id)))
+    if (!product && id) dispatch(fetchProductAsync(parseInt(id)));
   }, [id, item, dispatch, product]);
 
   function handleInputChange(event: any) {
@@ -63,7 +63,8 @@ export default function ProductDetails() {
     }
   }
 
-  if (productStatus.includes("pending")) return <LoadingComponent message="Loading product..." />;
+  if (productStatus.includes("pending"))
+    return <LoadingComponent message="Loading product..." />;
 
   if (!product) return <NotFound />;
 
@@ -124,7 +125,7 @@ export default function ProductDetails() {
               disabled={
                 item?.quantity === quantity || (!item && quantity === 0)
               }
-              loading={ item ? (item.quantity > quantity) ? status.includes("pendingRemove") : status.includes("pendingAdd") : status.includes("pendingAdd")}
+              loading={status.includes("pending")}
               onClick={handleUpdateCart}
               sx={{ height: "55px" }}
               color="primary"
