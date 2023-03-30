@@ -1,3 +1,4 @@
+import { catalogSlice } from "./../../features/catalog/catalogSlice";
 import { basketSlice } from "./../../features/basket/basketSlice";
 import { configureStore } from "@reduxjs/toolkit";
 import { counterSlice } from "../../features/contact/counterSlice";
@@ -11,6 +12,7 @@ export const store = configureStore({
   reducer: {
     counter: counterSlice.reducer,
     basket: basketSlice.reducer,
+    catalog: catalogSlice.reducer,
   },
 });
 
