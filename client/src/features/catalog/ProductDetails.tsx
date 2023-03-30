@@ -13,21 +13,22 @@ import {
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import agent from "../../app/api/agent";
-import { useStoreContext } from "../../app/context/StoreContext";
 import NotFound from "../../app/errors/NotFound";
 import LoadingComponent from "../../app/layout/LoadingComponent";
 import { Product } from "../../app/models/product";
 import { useAppSelector, useAppDispatch } from "../../app/store/configureStore";
-import { setBasket, removeItem } from "../basket/basketSlice";
+import {
+  addBasketItemAsync,
+  removeBasketItemAsync,
+} from "../basket/basketSlice";
 
 export default function ProductDetails() {
-  const { basket } = useAppSelector((state) => state.basket);
+  const { basket, status } = useAppSelector((state) => state.basket);
   const dispatch = useAppDispatch();
   const { id } = useParams<{ id: string }>();
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(0);
-  const [submitting, setSubmitting] = useState(false);
   const item = basket?.items.find((i) => i.productId === product?.id);
 
   useEffect(() => {
@@ -46,23 +47,22 @@ export default function ProductDetails() {
   }
 
   function handleUpdateCart() {
-    setSubmitting(true);
     if (!item || quantity > item.quantity) {
       const updateQuantity = item ? quantity - item.quantity : quantity;
-      agent.Basket.addItem(product?.id!, updateQuantity)
-        .then((basket) => dispatch(setBasket(basket)))
-        .catch((error) => console.log(error))
-        .finally(() => setSubmitting(false));
+      dispatch(
+        addBasketItemAsync({
+          productId: product?.id!,
+          quantity: updateQuantity,
+        })
+      );
     } else {
       const updateQuantity = item.quantity - quantity;
-      agent.Basket.removeItem(product?.id!, updateQuantity)
-        .then(() =>
-          dispatch(
-            removeItem({ productId: product?.id!, quantity: updateQuantity })
-          )
-        )
-        .catch((error) => console.log(error))
-        .finally(() => setSubmitting(false));
+      dispatch(
+        removeBasketItemAsync({
+          productId: product?.id!,
+          quantity: updateQuantity,
+        })
+      );
     }
   }
 
@@ -127,7 +127,7 @@ export default function ProductDetails() {
               disabled={
                 item?.quantity === quantity || (!item && quantity === 0)
               }
-              loading={submitting}
+              loading={ item ? (item.quantity > quantity) ? status.includes("pendingRemove") : status.includes("pendingAdd") : status.includes("pendingAdd")}
               onClick={handleUpdateCart}
               sx={{ height: "55px" }}
               color="primary"
