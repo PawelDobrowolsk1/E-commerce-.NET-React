@@ -2,6 +2,7 @@ import { router } from "./../router/Routes";
 import axios, { AxiosError, AxiosResponse } from "axios";
 import { toast } from "react-toastify";
 import { PaginatedResponse } from "../models/pagination";
+import { store } from "../store/configureStore";
 
 const sleep = () => new Promise((resolve) => setTimeout(resolve, 500));
 
@@ -10,12 +11,21 @@ axios.defaults.withCredentials = true;
 
 const responseBody = (response: AxiosResponse) => response.data;
 
+axios.interceptors.request.use(config => {
+  const token = store.getState().account.user?.token;
+  if(token) config.headers.Authorization = `Bearer ${token}`;
+  return config;
+})
+
 axios.interceptors.response.use(
   async (response) => {
     await sleep();
     const pagination = response.headers["pagination"];
-    if(pagination) {
-      response.data = new PaginatedResponse(response.data, JSON.parse(pagination));
+    if (pagination) {
+      response.data = new PaginatedResponse(
+        response.data,
+        JSON.parse(pagination)
+      );
       return response;
     }
     return response;
@@ -49,7 +59,8 @@ axios.interceptors.response.use(
 );
 
 const request = {
-  get: (url: string, params?: URLSearchParams) => axios.get(url, {params}).then(responseBody),
+  get: (url: string, params?: URLSearchParams) =>
+    axios.get(url, { params }).then(responseBody),
   post: (url: string, body: {}) => axios.post(url, body).then(responseBody),
   put: (url: string, body: {}) => axios.put(url, body).then(responseBody),
   delete: (url: string) => axios.delete(url).then(responseBody),
@@ -77,10 +88,17 @@ const Basket = {
     request.delete(`basket?productId=${productId}&quantity=${quantity}`),
 };
 
+const Account = {
+  login: (values: any) => request.post("account/login", values),
+  register: (values: any) => request.post("account/register", values),
+  currentUser: () => request.get("account/currentUser"),
+};
+
 const agent = {
   Catalog,
   TestErrors,
   Basket,
+  Account,
 };
 
 export default agent;
