@@ -11,11 +11,11 @@ axios.defaults.withCredentials = true;
 
 const responseBody = (response: AxiosResponse) => response.data;
 
-axios.interceptors.request.use(config => {
+axios.interceptors.request.use((config) => {
   const token = store.getState().account.user?.token;
-  if(token) config.headers.Authorization = `Bearer ${token}`;
+  if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
-})
+});
 
 axios.interceptors.response.use(
   async (response) => {
@@ -92,6 +92,13 @@ const Account = {
   login: (values: any) => request.post("account/login", values),
   register: (values: any) => request.post("account/register", values),
   currentUser: () => request.get("account/currentUser"),
+  fetchAddress: () => request.get("account/savedAddress")
+};
+
+const Orders = {
+  list: () => request.get("orders"),
+  fetch: (id: number) => request.get(`orders/${id}`),
+  create: (values: any) => request.post("orders", values),
 };
 
 const agent = {
@@ -99,6 +106,7 @@ const agent = {
   TestErrors,
   Basket,
   Account,
+  Orders,
 };
 
 export default agent;
