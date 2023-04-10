@@ -8,13 +8,13 @@ using System.Threading.Tasks;
 
 namespace API.Middleware
 {
-    public class ExceptionMiddlerawe
+    public class ExceptionMiddleware
     {
         private readonly RequestDelegate _next;
-        private readonly ILogger<ExceptionMiddlerawe> _logger;
+        private readonly ILogger<ExceptionMiddleware> _logger;
         private readonly IHostEnvironment _env;
 
-        public ExceptionMiddlerawe(RequestDelegate next, ILogger<ExceptionMiddlerawe> logger,
+        public ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddleware> logger,
             IHostEnvironment env)
         {
             _next= next;
